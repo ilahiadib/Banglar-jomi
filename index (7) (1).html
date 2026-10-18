@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বাংলার জমি</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f8f1;color:#20352a}
+header{background:#176b3a;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header h1{margin:0;font-size:25px}
+button{cursor:pointer;border:0;border-radius:9px;padding:12px 16px;font-weight:bold}
+.header-btn{background:white;color:#176b3a}
+.home,.page{max-width:1100px;margin:28px auto;padding:15px}
+.welcome{text-align:center;margin-bottom:25px}
+h2,h3{color:#176b3a}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.home-card{background:white;border:1px solid #d7e7d5;border-radius:15px;padding:25px 15px;text-align:center;cursor:pointer;box-shadow:0 4px 14px #0000000b}
+.home-card:hover{border-color:#176b3a}
+.emoji{font-size:38px}
+.home-card h3{margin:12px 0 6px}
+.home-card p,.muted{font-size:14px;color:#687668;line-height:1.7}
+.page{display:none}
+.page.active{display:block}
+.panel{background:white;border:1px solid #d9e7d9;border-radius:14px;padding:20px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+.field{margin-bottom:12px}
+label{display:block;font-weight:bold;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd8cb;border-radius:8px;background:white;font-size:15px}
+textarea{min-height:90px}
+.btn{background:#176b3a;color:white}
+.yellow{background:#ffd447;color:#25351f}
+.back{background:#e4efe3;color:#176b3a;margin-bottom:14px}
+.result{border:2px solid #b9d6b8;border-radius:13px;padding:17px;margin-top:18px;background:#fcfff9}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.datum{background:#f0f7ee;border:1px solid #dfeadd;padding:12px;border-radius:9px;overflow-wrap:anywhere}
+.datum small{display:block;color:#657366;margin-bottom:7px}
+.datum strong{font-size:17px}
+.warning{font-size:13px;line-height:1.7;color:#795c19;margin-top:15px}
+.status{padding:12px;background:#fff4d5;border-radius:8px;line-height:1.7}
+.comment{padding:13px 0;border-bottom:1px solid #e3e9e2;line-height:1.7}
+#mapFrame{width:100%;height:330px;border:0;border-radius:10px;margin-top:15px}
+footer{text-align:center;padding:22px;color:#718071}
+a{color:#176b3a}
+@media(max-width:600px){header h1{font-size:21px}.panel{padding:14px}}
+</style>
+</head>
+<body>
+
+<header>
+ <h1>🌿 বাংলার জমি</h1>
+ <button class="header-btn" onclick="openPage('profile')">👤 প্রোফাইল</button>
+</header>
+
+<section id="home" class="home">
+ <div class="welcome">
+  <h2>বাংলার জমিতে স্বাগতম</h2>
+  <p>জমির তথ্য খুঁজুন, ম্যাপ দেখুন এবং প্রয়োজনীয় তথ্য জানুন।</p>
+ </div>
+ <div class="home-grid">
+  <div class="home-card" onclick="openPage('land')">
+   <div class="emoji">📄</div><h3>ভূমি রেকর্ড</h3>
+   <p>খতিয়ান ও জমির তথ্য খুঁজুন।</p>
+  </div>
+  <div class="home-card" onclick="openPage('map')">
+   <div class="emoji">🗺️</div><h3>ল্যান্ড ম্যাপ</h3>
+   <p>বিভাগ, জেলা, উপজেলা ও দাগ নম্বর দিয়ে এলাকা খুঁজুন।</p>
+  </div>
+  <div class="home-card" onclick="openPage('discussion')">
+   <div class="emoji">💬</div><h3>আলোচনা</h3>
+   <p>জমি-সংক্রান্ত প্রশ্ন ও কমেন্ট দেখুন।</p>
+  </div>
+  <div class="home-card" onclick="openPage('ai')">
+   <div class="emoji">🤖</div><h3>নিউ এআই সহায়ক</h3>
+   <p>জমির বিষয় সহজ ভাষায় বুঝুন।</p>
+  </div>
+  <div class="home-card" onclick="openPage('profile')">
+   <div class="emoji">👤</div><h3>প্রোফাইল</h3>
+   <p>লগইন ও নমুনা জমির ইতিহাস দেখুন।</p>
+  </div>
+ </div>
+</section>
+
+<section id="land" class="page">
+ <button class="back" onclick="goHome()">← হোম পেজ</button>
+ <div class="panel">
+  <h2>ভূমি রেকর্ড সার্চ</h2>
+  <p class="muted">তথ্য নির্বাচন করে হলুদ “খতিয়ান সার্ভে” বাটনে ক্লিক করুন। মৌজা না লিখলেও নমুনা খতিয়ান ২০২ সার্চ করা যাবে।</p>
+  <div class="grid">
+   <div class="field"><label>বিভাগ</label><select id="ldiv"></select></div>
+   <div class="field"><label>জেলা</label><select id="ldist"></select></div>
+   <div class="field"><label>উপজেলা</label><select id="lup"></select></div>
+   <div class="field"><label>খতিয়ানের ধরন</label>
+    <select id="ltype">
+     <option value="BS">BS</option>
+     <option value="RS">RS</option>
+     <option value="নামজারি">নামজারি</option>
+    </select>
+   </div>
+   <div class="field"><label>মৌজা (ঐচ্ছিক)</label><input id="lmouza" placeholder="সীতাকুণ্ড"></div>
+   <div class="field"><label>খতিয়ান নম্বর</label><input id="lkhatian" placeholder="২০২" value="২০২"></div>
+  </div>
+  <button class="btn yellow" onclick="searchLand()">🔎 খতিয়ান সার্ভে</button>
+  <div id="landResult"></div>
+ </div>
+</section>
+
+<section id="map" class="page">
+ <button class="back" onclick="goHome()">← হোম পেজ</button>
+ <div class="panel">
+  <h2>🗺️ ল্যান্ড ম্যাপ</h2>
+  <div class="grid">
+   <div class="field"><label>বিভাগ</label><select id="mdiv"></select></div>
+   <div class="field"><label>জেলা</label><select id="mdist"></select></div>
+   <div class="field"><label>উপজেলা</label><select id="mup"></select></div>
+   <div class="field"><label>সার্ভে টাইপ</label>
+    <select id="mtype"><option>BS</option><option>RS</option><option>নামজারি</option></select>
+   </div>
+   <div class="field"><label>মৌজা</label><input id="mmouza" placeholder="সীতাকুণ্ড"></div>
+   <div class="field"><label>দাগ নম্বর</label><input id="mdag" placeholder="৫"></div>
+  </div>
+  <button class="btn" onclick="searchMap()">ম্যাপে খুঁজুন</button>
+  <div id="mapResult"></div>
+  <div id="mapLink"></div>
+ </div>
+</section>
+
+<section id="discussion" class="page">
+ <button class="back" onclick="goHome()">← হোম পেজ</button>
+ <div class="panel">
+  <h2>💬 আলোচনা</h2>
+  <div class="field"><label>কমেন্ট খুঁজুন</label><input id="commentSearch" placeholder="উকিল, জমি, নামজারি"></div>
+  <button class="btn" onclick="filterComments()">সার্চ</button>
+  <div id="comments"></div>
+ </div>
+ <div class="panel">
+  <h3>নিজের কমেন্ট যোগ করুন</h3>
+  <div class="field"><label>নাম</label><input id="commentName" placeholder="আপনার নাম"></div>
+  <div class="field"><label>কমেন্ট</label><textarea id="commentText" placeholder="আপনার কথা লিখুন"></textarea></div>
+  <button class="btn" onclick="addComment()">কমেন্ট পোস্ট করুন</button>
+  <p class="muted">কমেন্ট এই পেজের বর্তমান সেশনে থাকবে।</p>
+ </div>
+</section>
+
+<section id="ai" class="page">
+ <button class="back" onclick="goHome()">← হোম পেজ</button>
+ <div class="panel">
+  <h2>🤖 নিউ এআই সহায়ক</h2>
+  <p>খতিয়ান, মৌজা, দাগ নম্বর, নামজারি, BS বা RS লিখে সার্চ করুন।</p>
+  <div class="field"><label>আপনার প্রশ্ন</label><input id="aiQuery" placeholder="খতিয়ান কী?"></div>
+  <button class="btn" onclick="searchAI()">ব্যাখ্যা দেখুন</button>
+  <div id="aiResult"></div>
+ </div>
+</section>
+
+<section id="profile" class="page">
+ <button class="back" onclick="goHome()">← হোম পেজ</button>
+ <div class="panel" id="loginPanel">
+  <h2>👤 লগইন</h2>
+  <div class="field"><label>মোবাইল নম্বর অথবা NID</label><input id="loginId" placeholder="মোবাইল / NID"></div>
+  <div class="field"><label>পাসওয়ার্ড</label><input id="loginPassword" type="password" placeholder="পাসওয়ার্ড"></div>
+  <button class="btn" onclick="login()">লগইন</button>
+  <p class="muted">এটি ডেমো লগইন; পরিচয় যাচাই করা হয় না।</p>
+ </div>
+ <div class="panel" id="profilePanel" style="display:none">
+  <h2>👤 আমার প্রোফাইল</h2>
+  <p id="welcome"></p>
+  <div id="profileLand"></div>
+  <button class="btn" onclick="openPage('map')">🗺️ লাইভ ম্যাপ খুলুন</button>
+  <button class="btn" style="background:#a33" onclick="logout()">লগআউট</button>
+ </div>
+</section>
+
+<footer>বাংলার জমি — শিক্ষামূলক ডেমো ওয়েবসাইট</footer>
+
+<script>
+const divisions=["বরিশাল","চট্টগ্রাম","ঢাকা","খুলনা","ময়মনসিংহ","রাজশাহী","রংপুর","সিলেট"];
+
+const districtData={
+"বরিশাল":["বরিশাল","বরগুনা","ভোলা","ঝালকাঠি","পটুয়াখালী","পিরোজপুর"],
+"চট্টগ্রাম":["চট্টগ্রাম","কক্সবাজার","কুমিল্লা","ব্রাহ্মণবাড়িয়া","চাঁদপুর","ফেনী","খাগড়াছড়ি","লক্ষ্মীপুর","নোয়াখালী","রাঙ্গামাটি","বান্দরবান"],
+"ঢাকা":["ঢাকা","গাজীপুর","গোপালগঞ্জ","কিশোরগঞ্জ","মাদারীপুর","মানিকগঞ্জ","মুন্সীগঞ্জ","নারায়ণগঞ্জ","নরসিংদী","রাজবাড়ী","শরীয়তপুর","টাঙ্গাইল","ফরিদপুর"],
+"খুলনা":["খুলনা","বাগেরহাট","চুয়াডাঙ্গা","যশোর","ঝিনাইদহ","কুষ্টিয়া","মাগুরা","মেহেরপুর","নড়াইল","সাতক্ষীরা"],
+"ময়মনসিংহ":["ময়মনসিংহ","জামালপুর","নেত্রকোণা","শেরপুর"],
+"রাজশাহী":["রাজশাহী","বগুড়া","জয়পুরহাট","নওগাঁ","নাটোর","চাঁপাইনবাবগঞ্জ","পাবনা","সিরাজগঞ্জ"],
+"রংপুর":["রংপুর","দিনাজপুর","গাইবান্ধা","কুড়িগ্রাম","লালমনিরহাট","নীলফামারী","পঞ্চগড়","ঠাকুরগাঁও"],
+"সিলেট":["সিলেট","হবিগঞ্জ","মৌলভীবাজার","সুনামগঞ্জ"]
+};
+
+const upazilaData={
+"চট্টগ্রাম":{
+"চট্টগ্রাম":["আনোয়ারা","বাঁশখালী","বোয়ালখালী","চন্দনাইশ","ফটিকছড়ি","হাটহাজারী","কর্ণফুলী","লোহাগাড়া","মীরসরাই","পটিয়া","রাঙ্গুনিয়া","রাউজান","সন্দ্বীপ","সাতকানিয়া","সীতাকুণ্ড"],
+"কক্সবাজার":["কক্সবাজার সদর","চকরিয়া","কুতুবদিয়া","মহেশখালী","পেকুয়া","রামু","টেকনাফ","উখিয়া","ঈদগাঁও"],
+"কুমিল্লা":["কুমিল্লা সদর","বরুড়া","ব্রাহ্মণপাড়া","বুড়িচং","চান্দিনা","চৌদ্দগ্রাম","দাউদকান্দি","দেবিদ্বার","হোমনা","লাকসাম","মনোহরগঞ্জ","মুরাদনগর","নাঙ্গলকোট","তিতাস","মেঘনা","লালমাই"],
+"ব্রাহ্মণবাড়িয়া":["ব্রাহ্মণবাড়িয়া সদর","আখাউড়া","আশুগঞ্জ","বাঞ্ছারামপুর","কসবা","নবীনগর","নাসিরনগর","সরাইল","বিজয়নগর"],
+"চাঁদপুর":["চাঁদপুর সদর","হাইমচর","ফরিদগঞ্জ","কচুয়া","মতলব উত্তর","মতলব দক্ষিণ","শাহরাস্তি","হাজীগঞ্জ"],
+"ফেনী":["ফেনী সদর","ছাগলনাইয়া","দাগনভূঞা","পরশুরাম","ফুলগাজী","সোনাগাজী"],
+"খাগড়াছড়ি":["খাগড়াছড়ি সদর","দীঘিনালা","পানছড়ি","লক্ষ্মীছড়ি","মহালছড়ি","মানিকছড়ি","রামগড়","মাটিরাঙ্গা","গুইমারা"],
+"লক্ষ্মীপুর":["লক্ষ্মীপুর সদর","রায়পুর","রামগঞ্জ","রামগতি","কমলনগর"],
+"নোয়াখালী":["নোয়াখালী সদর","বেগমগঞ্জ","চাটখিল","কোম্পানীগঞ্জ","হাতিয়া","সেনবাগ","সোনাইমুড়ী","সুবর্ণচর","কবিরহাট"],
+"রাঙ্গামাটি":["রাঙ্গামাটি সদর","কাপ্তাই","কাউখালী","বাঘাইছড়ি","বরকল","জুরাছড়ি","লংগদু","নানিয়ারচর","রাজস্থলী","বিলাইছড়ি"],
+"বান্দরবান":["বান্দরবান সদর","আলীকদম","থানচি","নাইক্ষ্যংছড়ি","রুমা","লামা","রোয়াংছড়ি"]
+},
+"ঢাকা":{
+"ঢাকা":["সাভার","ধামরাই","কেরানীগঞ্জ","নবাবগঞ্জ","দোহার"],
+"গাজীপুর":["গাজীপুর সদর","কালিয়াকৈর","কালীগঞ্জ","কাপাসিয়া","শ্রীপুর"],
+"টাঙ্গাইল":["টাঙ্গাইল সদর","বাসাইল","ভুয়াপুর","দেলদুয়ার","ঘাটাইল","গোপালপুর","মধুপুর","মির্জাপুর","নাগরপুর","সখীপুর","ধনবাড়ী","কালিহাতী"]
+}
+};
+
+function $(id){return document.getElementById(id)}
+function norm(s){
+ return String(s||"").trim().toLowerCase()
+ .replace(/[০-৯]/g,d=>"০১২৩৪৫৬৭৮৯".indexOf(d))
+ .replace(/\s+/g,"");
+}
+function fillSelect(id,items,placeholder="নির্বাচন করুন"){
+ const s=$(id),old=s.value;
+ s.innerHTML="";
+ const first=document.createElement("option");
+ first.value="";first.textContent=placeholder;s.appendChild(first);
+ [...new Set(items)].forEach(v=>{
+  const o=document.createElement("option");o.value=v;o.textContent=v;s.appendChild(o);
+ });
+ if(items.includes(old))s.value=old;
+}
+function setupSelects(){
+ ["ldiv","mdiv"].forEach(id=>fillSelect(id,divisions,"বিভাগ নির্বাচন করুন"));
+ ["ldist","mdist"].forEach(id=>fillSelect(id,[],"জেলা নির্বাচন করুন"));
+ ["lup","mup"].forEach(id=>fillSelect(id,[],"উপজেলা নির্বাচন করুন"));
+ $("ldiv").onchange=()=>updateDistricts("l");
+ $("mdiv").onchange=()=>updateDistricts("m");
+ $("ldist").onchange=()=>updateUpazilas("l");
+ $("mdist").onchange=()=>updateUpazilas("m");
+}
+function updateDistricts(p){
+ fillSelect(p+"dist",districtData[$(p+"div").value]||[],"জেলা নির্বাচন করুন");
+ fillSelect(p+"up",[],"উপজেলা নির্বাচন করুন");
+}
+function updateUpazilas(p){
+ const div=$(p+"div").value,dist=$(p+"dist").value;
+ fillSelect(p+"up",(upazilaData[div]&&upazilaData[div][dist])||[],"উপজেলা নির্বাচন করুন");
+}
+function openPage(id){
+ $("home").style.display="none";
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $(id).classList.add("active");
+ if(id==="discussion")renderComments(starterComments.concat(userComments));
+ if(id==="profile")renderProfile();
+ window.scrollTo(0,0);
+}
+function goHome(){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $("home").style.display="block";window.scrollTo(0,0);
+}
+
+/* নমুনা ভূমি রেকর্ড */
+const record={
+ division:"চট্টগ্রাম",district:"চট্টগ্রাম",upazila:"সীতাকুণ্ড",
+ mouza:"সীতাকুণ্ড",khatian:"২০২",dag:"৫",area:"১০ একর",
+ owners:{"BS":"আশিক ইলাহী","RS":"আবদুল মালেক","নামজারি":"আসিফ ইলাহি"}
+};
+
+function isDemoLocation(div,dist,up){
+ return div==="চট্টগ্রাম"&&dist==="চট্টগ্রাম"&&up==="সীতাকুণ্ড";
+}
+
+function searchLand(){
+ const div=$("ldiv").value;
+ const dist=$("ldist").value;
+ const up=$("lup").value;
+ const type=$("ltype").value;
+ const mouza=$("lmouza").value.trim();
+ const khatian=$("lkhatian").value.trim();
+
+ if(!div||!dist||!up||!khatian){
+  $("landResult").innerHTML='<p class="status">বিভাগ, জেলা, উপজেলা ও খতিয়ান নম্বর নির্বাচন বা পূরণ করুন।</p>';
+  return;
+ }
+
+ const locationMatch=isDemoLocation(div,dist,up);
+ const khatianMatch=norm(khatian)===norm(record.khatian);
+ const searchedMouza=mouza||record.mouza;
+ const mouzaMatch=norm(searchedMouza)===norm(record.mouza)||norm(searchedMouza)==="চিটাগং";
+
+ if(!locationMatch||!khatianMatch||!mouzaMatch){
+  $("landResult").innerHTML=`
+   <div class="result">
+    <h3>🔎 সার্চ রেজাল্ট</h3>
+    <p>দুঃখিত, দেওয়া তথ্যের সঙ্গে ডেমো রেকর্ড মেলেনি।</p>
+    <p class="warning">নমুনা ফলাফল দেখতে চট্টগ্রাম বিভাগ → চট্টগ্রাম জেলা → সীতাকুণ্ড উপজেলা → খতিয়ান নম্বর ২০২ দিন। মৌজা ঘর ফাঁকা রাখতে পারেন।</p>
+   </div>`;
+  return;
+ }
+
+ const owner=record.owners[type]||"তথ্য পাওয়া যায়নি";
+
+ $("landResult").innerHTML=`
+ <div class="result">
+  <h3>✅ সার্চ রেজাল্ট</h3>
+  <p>আপনার দেওয়া তথ্যের জন্য একটি নমুনা রেকর্ড পাওয়া গেছে।</p>
+  <div class="result-grid">
+   <div class="datum"><small>জমির মালিকের নাম</small><strong>${owner}</strong></div>
+   <div class="datum"><small>বিভাগ</small><strong>${record.division}</strong></div>
+   <div class="datum"><small>জেলা</small><strong>${record.district}</strong></div>
+   <div class="datum"><small>উপজেলা</small><strong>${record.upazila}</strong></div>
+   <div class="datum"><small>খতিয়ানের ধরন</small><strong>${type}</strong></div>
+   <div class="datum"><small>খতিয়ান নম্বর</small><strong>${record.khatian}</strong></div>
+   <div class="datum"><small>জমি আছে কি?</small><strong>হ্যাঁ (নমুনা)</strong></div>
+   <div class="datum"><small>জমির পরিমাণ</small><strong>${record.area}</strong></div>
+   <div class="datum"><small>মৌজা</small><strong>${record.mouza}</strong></div>
+   <div class="datum"><small>দাগ নম্বর</small><strong>${record.dag}</strong></div>
+  </div>
+  <p class="warning">⚠️ এটি ডেমো রেকর্ড। সরকারি ভূমি ডেটাবেস থেকে যাচাই করা হয়নি। বাস্তব মালিকানা বা জমির পরিমাণের প্রমাণ হিসেবে ব্যবহার করবেন না।</p>
+ </div>`;
+}
+
+function searchMap(){
+ const div=$("mdiv").value,dist=$("mdist").value,up=$("mup").value;
+ const type=$("mtype").value,mouza=$("mmouza").value.trim(),dag=$("mdag").value.trim();
+
+ if(!div||!dist||!up||!mouza||!dag){
+  $("mapResult").innerHTML='<p class="status">বিভাগ, জেলা, উপজেলা, মৌজা ও দাগ নম্বর পূরণ করুন।</p>';
+  $("mapLink").innerHTML="";return;
+ }
+ const match=isDemoLocation(div,dist,up)&&norm(dag)===norm(record.dag)&&norm(mouza)===norm(record.mouza);
+ $("mapResult").innerHTML=`
+ <div class="result"><h3>ম্যাপ সার্চ রেজাল্ট</h3>
+ <div class="result-grid">
+ <div class="datum"><small>বিভাগ</small><strong>${div}</strong></div>
+ <div class="datum"><small>জেলা</small><strong>${dist}</strong></div>
+ <div class="datum"><small>উপজেলা</small><strong>${up}</strong></div>
+ <div class="datum"><small>সার্ভে টাইপ</small><strong>${type}</strong></div>
+ <div class="datum"><small>মৌজা</small><strong>${mouza}</strong></div>
+ <div class="datum"><small>দাগ নম্বর</small><strong>${dag}</strong></div>
+ <div class="datum"><small>জমি আছে কি?</small><strong>${match?"হ্যাঁ (নমুনা)":"যাচাই হয়নি"}</strong></div>
+ <div class="datum"><small>জমির পরিমাণ</small><strong>${match?record.area:"যাচাই হয়নি"}</strong></div>
+ </div>
+ <p class="warning">গুগল ম্যাপ সাধারণ এলাকার অবস্থান দেখায়, প্রকৃত দাগের সীমানা নয়।</p></div>`;
+ const query=encodeURIComponent([up,dist,div,"Bangladesh"].join(", "));
+ $("mapLink").innerHTML=`<iframe id="mapFrame" loading="lazy" src="https://maps.google.com/maps?q=${query}&output=embed"></iframe><p><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${query}">গুগল ম্যাপে খুলুন ↗</a></p>`;
+}
+
+const starterComments=[
+ {n:"ভূমি ব্যবহারকারী",t:"খতিয়ান ও দাগ নম্বর মিলিয়ে জমির রেকর্ড যাচাই করুন।"},
+ {n:"আইনি পরামর্শ",t:"জমির বিরোধ হলে যোগ্য আইনজীবীর পরামর্শ নিন। এখানে কোনো আইনজীবীর নম্বর যাচাই করা হয়নি।"},
+ {n:"জমির মালিক",t:"নামজারি করতে প্রয়োজনীয় দলিল ও আগের রেকর্ড যাচাই করুন।"},
+ {n:"জমি-সংক্রান্ত প্রশ্ন",t:"জমির সীমানা নিয়ে সমস্যা হলে সংশ্লিষ্ট ভূমি অফিসে যোগাযোগ করুন।"}
+];
+let userComments=[];
+function esc(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function renderComments(list){
+ $("comments").innerHTML=list.length?list.map(c=>`<div class="comment"><b>${esc(c.n)}</b><br>${esc(c.t)}</div>`).join(""):"<p>কোনো কমেন্ট পাওয়া যায়নি।</p>";
+}
+function filterComments(){
+ const q=norm($("commentSearch").value),all=starterComments.concat(userComments);
+ renderComments(q?all.filter(c=>norm(c.n+" "+c.t).includes(q)):all);
+}
+function addComment(){
+ const n=$("commentName").value.trim(),t=$("commentText").value.trim();
+ if(!n||!t){alert("নাম ও কমেন্ট লিখুন।");return;}
+ userComments.push({n,t});$("commentName").value="";$("commentText").value="";
+ renderComments(starterComments.concat(userComments));alert("কমেন্ট যোগ হয়েছে।");
+}
+
+const aiData=[
+ {keys:["খতিয়ান"],title:"খতিয়ান কী?",text:"খতিয়ান হলো জমির রেকর্ড। এতে মালিক বা দখলদারের নাম, জমির পরিমাণ ও দাগ নম্বরের মতো তথ্য থাকতে পারে।"},
+ {keys:["মৌজা"],title:"মৌজা কী?",text:"মৌজা হলো ভূমি জরিপে ব্যবহৃত নির্দিষ্ট ভৌগোলিক এলাকা। একটি মৌজায় একাধিক দাগ থাকতে পারে।"},
+ {keys:["দাগ","ডাগ"],title:"দাগ নম্বর কী?",text:"জরিপের মানচিত্রে জমির নির্দিষ্ট খণ্ড শনাক্ত করার নম্বরকে দাগ নম্বর বলে।"},
+ {keys:["নামজারি"],title:"নামজারি কী?",text:"জমি হস্তান্তর বা উত্তরাধিকারের পর প্রযোজ্য নিয়মে নতুন মালিকের নামে ভূমি রেকর্ড হালনাগাদ করার প্রক্রিয়া হলো নামজারি।"},
+ {keys:["bs"],title:"BS কী?",text:"BS একটি ভূমি জরিপ/রেকর্ডের সংক্ষিপ্ত নাম। নির্দিষ্ট এলাকার রেকর্ড সরকারি উৎস থেকে যাচাই করুন।"},
+ {keys:["rs"],title:"RS কী?",text:"RS সাধারণত Revisional Survey বোঝাতে ব্যবহৃত হয়। সংশ্লিষ্ট এলাকার RS খতিয়ান সরকারি উৎস থেকে যাচাই করুন।"}
+];
+function searchAI(){
+ const q=norm($("aiQuery").value);
+ if(!q){$("aiResult").innerHTML='<p class="status">একটি প্রশ্ন লিখুন।</p>';return;}
+ const results=aiData.filter(d=>d.keys.some(k=>q.includes(norm(k))));
+ $("aiResult").innerHTML=results.length?results.map(d=>`<div class="result"><h3>${d.title}</h3><p>${d.text}</p></div>`).join(""):'<div class="result">এই শব্দের ব্যাখ্যা ডেমোতে নেই। খতিয়ান, মৌজা, দাগ, নামজারি, BS বা RS দিয়ে চেষ্টা করুন।</div>';
+}
+
+let loggedUser="";
+function login(){
+ const id=$("loginId").value.trim(),pw=$("loginPassword").value;
+ if(!id||!pw){alert("মোবাইল/NID এবং পাসওয়ার্ড লিখুন।");return;}
+ loggedUser=id;renderProfile();
+}
+function logout(){loggedUser="";$("loginPassword").value="";renderProfile();}
+function renderProfile(){
+ $("loginPanel").style.display=loggedUser?"none":"block";
+ $("profilePanel").style.display=loggedUser?"block":"none";
+ if(!loggedUser)return;
+ $("welcome").textContent="লগইন আইডি: "+loggedUser;
+ $("profileLand").innerHTML=`
+ <div class="result"><h3>জমির তথ্য (নমুনা)</h3>
+ <div class="result-grid">
+ <div class="datum"><small>জমির মালিকের নাম</small><strong>আশিক ইলাহী</strong></div>
+ <div class="datum"><small>জমি আছে কি?</small><strong>হ্যাঁ (নমুনা)</strong></div>
+ <div class="datum"><small>বিভাগ</small><strong>চট্টগ্রাম</strong></div>
+ <div class="datum"><small>জেলা</small><strong>চট্টগ্রাম</strong></div>
+ <div class="datum"><small>উপজেলা</small><strong>সীতাকুণ্ড</strong></div>
+ <div class="datum"><small>খতিয়ান নম্বর</small><strong>২০২</strong></div>
+ <div class="datum"><small>মৌজা</small><strong>সীতাকুণ্ড</strong></div>
+ <div class="datum"><small>দাগ নম্বর</small><strong>৫</strong></div>
+ <div class="datum"><small>সার্ভে টাইপ</small><strong>BS</strong></div>
+ <div class="datum"><small>জমির পরিমাণ</small><strong>১০ একর</strong></div>
+ </div>
+ <h3>জমির ইতিহাস</h3>
+ <div class="comment">RS — আবদুল মালেক</div>
+ <div class="comment">BS — আশিক ইলাহী</div>
+ <div class="comment">নামজারি — আসিফ ইলাহি</div>
+ <p class="warning">এই তথ্যগুলো ডেমো ডেটা; সরকারি মালিকানা যাচাই করা হয়নি।</p></div>`;
+}
+setupSelects();
+</script>
+</body>
+</html>
